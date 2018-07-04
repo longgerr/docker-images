@@ -15,7 +15,7 @@
 FROM alpine:edge
 
 # Add kubectl to enable sentinels to change labels during promotion
-ADD https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl /usr/local/bin/kubectl
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.9.6/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
 RUN apk add --no-cache bash sed curl redis=4.0.10-r0 ca-certificates

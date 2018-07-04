@@ -139,7 +139,9 @@ function launchslave() {
 
   sed -i "s/%master-ip%/${MASTER_LB_HOST}/" $SLAVE_CONF
   sed -i "s/%master-port%/${MASTER_LB_PORT}/" $SLAVE_CONF
-  redis-server $SLAVE_CONF --protected-mode no $@
+  
+  POD_IP=`hostname -i`
+  redis-server $SLAVE_CONF --slave-announce-ip "${POD_IP}" --protected-mode no $@
 }
 
 #Check if MASTER environment variable is set

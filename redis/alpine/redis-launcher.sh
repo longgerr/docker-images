@@ -46,6 +46,9 @@ MASTER_LB_PORT="${!PORTVAR}"
 MASTER_LB_HOST="${!HOSTVAR}"
 QUORUM=${QUORUM:-2}
 
+# Controls sentinel down-after-milliseconds mymaster $SENTINEL_DOWN_TIME
+SENTINEL_DOWN_TIME=${SENTINEL_DOWN_TIME:10000}
+
 # Only sets AUTH if the ENV var REDIS_PASS is set.
 REDISAUTH=""
 [ -n "$REDIS_PASS" ] && REDISAUTH="-a $REDIS_PASS" || REDISAUTH=""
@@ -91,7 +94,7 @@ function launchsentinel() {
   done
 
   echo "sentinel monitor mymaster ${MASTER_IP} ${MASTER_LB_PORT} ${QUORUM}" > ${SENTINEL_CONF}
-  echo "sentinel down-after-milliseconds mymaster 15000" >> ${SENTINEL_CONF}
+  echo "sentinel down-after-milliseconds mymaster ${SENTINEL_DOWN_TIME}" >> ${SENTINEL_CONF}
   echo "sentinel failover-timeout mymaster 30000" >> ${SENTINEL_CONF}
   echo "sentinel parallel-syncs mymaster 10" >> ${SENTINEL_CONF}
   echo "bind 0.0.0.0" >> ${SENTINEL_CONF}
@@ -139,7 +142,7 @@ function launchslave() {
 
   sed -i "s/%master-ip%/${MASTER_LB_HOST}/" $SLAVE_CONF
   sed -i "s/%master-port%/${MASTER_LB_PORT}/" $SLAVE_CONF
-  
+
   POD_IP=`hostname -i`
   redis-server $SLAVE_CONF --slave-announce-ip "${POD_IP}" --protected-mode no $@
 }
